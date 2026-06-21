@@ -1,0 +1,5 @@
+<resources>
+    <style name="Theme.ShowTrakSample" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
+    </style>
+</resources>
