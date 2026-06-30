@@ -47,7 +47,7 @@ In the app, enter:
 
 Then tap Connect.
 
-If the server is running on the same Mac as the Android emulator, use `10.0.2.2` as the Server IP.
+If the server is running on the same computer as the Android emulator, use `10.0.2.2` as the Server IP.
 
 ## Adopt the device
 
@@ -63,8 +63,3 @@ In ShowTrak, right-click the integrated client and run:
 - Set Box Blue
 
 You should see the box color change in the app.
-
-## Notes
-
-- This app is intentionally small.
-- It is meant as a reference/demo, not a full production client.
