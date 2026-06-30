@@ -42,7 +42,7 @@ you have network access to Maven Central.
 In the app, enter:
 
 - Server IP
-- Server Port (usually `8000`)
+- Server Port (usually `3000`)
 - Client ID (optional, can be left blank)
 
 Then tap Connect.
