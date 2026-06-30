@@ -13,38 +13,18 @@ When one of those actions is triggered from ShowTrak, the color box in the app u
 ## What is in this repo
 
 - `app/`: the demo Android app (`io.showtrak.sample`)
-- `../ShowTrak-SDK-Android/showtrak-sdk/`: the shared SDK module used by the demo
+
+SDK dependency:
+- `io.github.showtrak:showtrak-sdk:1.0.2`
 
 SDK repository:
 - https://github.com/ShowTrak/ShowTrak-SDK-Android
 
-The demo references the SDK module from the sibling SDK repo in `settings.gradle.kts`.
-
-## Download with submodules
-
-Clone the demo with submodules:
-
-```bash
-git clone --recurse-submodules https://github.com/ShowTrak/ShowTrak-SDK-Android-Demo.git
-```
-
-If you already cloned it without submodules, run:
-
-```bash
-git submodule update --init --recursive
-```
-
 ## Troubleshooting
 
-If Gradle sync fails with an error that the `showtrak-sdk` module cannot be found, the SDK submodule is probably missing.
-
-Run:
-
-```bash
-git submodule update --init --recursive
-```
-
-Then sync Gradle again in Android Studio.
+If Gradle sync fails resolving `io.github.showtrak:showtrak-sdk`, verify that
+`mavenCentral()` is available in `settings.gradle.kts` repositories and that
+you have network access to Maven Central.
 
 ## Requirements
 

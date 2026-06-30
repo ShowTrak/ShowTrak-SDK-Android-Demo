@@ -16,5 +16,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "ShowTrakAndroidClient"
 include(":app")
-include(":showtrak-sdk")
-project(":showtrak-sdk").projectDir = file("../ShowTrak-SDK-Android/showtrak-sdk")
