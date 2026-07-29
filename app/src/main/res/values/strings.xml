@@ -24,7 +24,7 @@
     <string name="box_now_format">Box is now: %1$s</string>
 
     <!-- Feedback demo -->
-    <string name="feedback_call_format">ack.feedback() call %1$d of %2$d</string>
+    <string name="feedback_call_format">Example call %1$d of %2$d</string>
     <string name="feedback_finished_format">ack.success() sent — ack is %1$s</string>
     <string name="feedback_stopped_format">Stopped early: ack is %1$s</string>
 
