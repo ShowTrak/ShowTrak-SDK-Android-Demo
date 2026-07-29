@@ -19,8 +19,8 @@ import java.util.concurrent.Executors
 /**
  * Main screen for the Android demo app.
  *
- * It stores server settings, connects to ShowTrak, and registers
- * four simple actions that change the color box.
+ * It stores server settings, connects to ShowTrak, and registers four actions
+ * that change the color box plus one that demonstrates progress feedback.
  */
 class MainActivity : AppCompatActivity() {
 
@@ -93,41 +93,44 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * A deliberately slow event: five one-second steps, each reported through
-     * [Ack.feedback] so the message appears live on this event's row in
-     * ShowTrak's execution view. The work runs on a background thread — holding
-     * the SDK's callback thread for five seconds would stall its heartbeats.
+     * Demonstrates [Ack.feedback] and nothing else. It makes five calls, one a
+     * second, and each message says exactly which call it is — there is no
+     * pretend workload here, and the sleep exists only to space the messages
+     * out far enough to watch them land in ShowTrak's execution view.
+     *
+     * It runs on a background thread because holding the SDK's callback thread
+     * for five seconds would stall its heartbeats.
      */
-    private fun registerSlowEvent() {
+    private fun registerFeedbackDemoEvent() {
         val options = EventOptions(
-            label = "Run Diagnostics (5s)",
+            label = "Feedback Demo",
             colour = 5,
             hasFeedback = true,
-            icon = "activity",
-            // Comfortably longer than the work; drop it below 5000 to watch the
-            // ack resolve as RESOLVED_TIMEOUT instead.
+            icon = "broadcast",
+            // Comfortably longer than the five calls; drop it below 5000 to
+            // watch the ack resolve as RESOLVED_TIMEOUT instead.
             timeoutMs = 20_000,
         )
-        ShowTrak.registerEvent("RunDiagnostics", options) { ack: Ack ->
+        ShowTrak.registerEvent("FeedbackDemo", options) { ack: Ack ->
             worker.execute {
                 try {
-                    for (step in 1..DIAGNOSTIC_STEPS) {
-                        // Someone else may have resolved this ack already (the
+                    for (call in 1..FEEDBACK_CALLS) {
+                        // Something else may have resolved this ack already (the
                         // timeout, most likely) — stop rather than report on.
                         if (ack.isResolved()) {
-                            showProgress("Diagnostics ${ack.getStatus()}")
+                            showProgress("Stopped early: ack is ${ack.getStatus()}")
                             return@execute
                         }
                         Thread.sleep(1000)
-                        val message = "Step $step of $DIAGNOSTIC_STEPS complete"
+                        val message = "ack.feedback() call $call of $FEEDBACK_CALLS"
                         ack.feedback(message)
                         showProgress(message)
                     }
                     ack.success()
-                    showProgress("Diagnostics finished: ${ack.getStatus()}")
+                    showProgress("ack.success() sent — ack is ${ack.getStatus()}")
                 } catch (e: InterruptedException) {
                     Thread.currentThread().interrupt()
-                    ack.error("Diagnostics interrupted")
+                    ack.error("Interrupted before ack.success()")
                 }
             }
         }
@@ -138,14 +141,21 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun registerDemoEvents() {
-        registerSlowEvent()
-        // Each event picks its own Bootstrap Icons glyph, shown beside it in the
-        // ShowTrak menu. "Reset Box" deliberately passes no icon to show the
-        // default (a terminal glyph) that older integrations get for free.
-        registerColourEvent("SetBoxRed", "Set Box Red", colour = 0, hex = "#e74c3c", icon = "exclamation-octagon-fill")
-        registerColourEvent("SetBoxGreen", "Set Box Green", colour = 3, hex = "#2ecc71", icon = "check-circle-fill")
-        registerColourEvent("SetBoxBlue", "Set Box Blue", colour = 4, hex = "#3498db", icon = "droplet-fill")
-        registerColourEvent("ResetBox", "Reset Box", colour = 7, hex = DEFAULT_BOX_COLOUR, icon = null)
+        registerFeedbackDemoEvent()
+        // Each event names a Bootstrap Icons glyph, shown beside it in the
+        // ShowTrak menu and tinted with the event's colour. The three colour
+        // events share a plain filled circle so the colour is what tells them
+        // apart; Reset Box gets its own glyph and colour.
+        registerColourEvent("SetBoxRed", "Set Box Red", colour = 0, hex = "#e74c3c", icon = "circle-fill")
+        registerColourEvent("SetBoxGreen", "Set Box Green", colour = 3, hex = "#2ecc71", icon = "circle-fill")
+        registerColourEvent("SetBoxBlue", "Set Box Blue", colour = 4, hex = "#3498db", icon = "circle-fill")
+        registerColourEvent(
+            "ResetBox",
+            "Reset Box",
+            colour = 1,
+            hex = DEFAULT_BOX_COLOUR,
+            icon = "arrow-counterclockwise",
+        )
     }
 
     private fun registerColourEvent(id: String, label: String, colour: Int, hex: String, icon: String?) {
@@ -196,7 +206,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val DIAGNOSTIC_STEPS = 5
+        private const val FEEDBACK_CALLS = 5
 
         // Matches the box's starting colour in activity_main.xml.
         private const val DEFAULT_BOX_COLOUR = "#7f8c8d"

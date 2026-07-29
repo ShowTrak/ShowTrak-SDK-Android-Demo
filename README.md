@@ -4,25 +4,26 @@ This project is a simple demo app for the ShowTrak Android SDK.
 
 It connects to a ShowTrak Server and registers five test actions:
 
-- Set Box Red (icon `exclamation-octagon-fill`)
-- Set Box Green (icon `check-circle-fill`)
-- Set Box Blue (icon `droplet-fill`)
-- Reset Box (no icon — shows the default `terminal` glyph)
-- Run Diagnostics (5s) (icon `activity` — reports progress while it runs)
+- Set Box Red (icon `circle-fill`, red)
+- Set Box Green (icon `circle-fill`, green)
+- Set Box Blue (icon `circle-fill`, blue)
+- Reset Box (icon `arrow-counterclockwise`, orange)
+- Feedback Demo (icon `broadcast`, purple — demonstrates `ack.feedback()`)
 
 When one of the colour actions is triggered from ShowTrak, the color box in the app updates.
 
-Each action can name a [Bootstrap Icons](https://icons.getbootstrap.com) glyph via
-`EventOptions(icon = ...)`, which ShowTrak draws beside it in the menu. The icon is
-optional: `Reset Box` omits it on purpose so you can see the default an integration
-gets when it says nothing.
+Each action names a [Bootstrap Icons](https://icons.getbootstrap.com) glyph via
+`EventOptions(icon = ...)`, which ShowTrak draws beside it in the menu, tinted with
+the action's colour. The three colour actions share a plain filled circle so the
+colour is what distinguishes them. The icon is optional — omit it and the action
+shows the default `terminal` glyph.
 
 ## What is in this repo
 
 - `app/`: the demo Android app (`io.showtrak.sample`)
 
 SDK dependency:
-- `io.github.showtrak:showtrak-sdk:1.2.0`
+- `io.github.showtrak:showtrak-sdk:1.2.1`
 
 SDK repository:
 - https://github.com/ShowTrak/ShowTrak-SDK-Android
@@ -75,12 +76,14 @@ You should see the box color change in the app, and each action listed under
 
 ## Try the progress feedback
 
-Run **Run Diagnostics (5s)**. It takes five seconds, one second per step, and
-calls `ack.feedback("Step N of 5 complete")` after each one. Watch the script
-execution popup in ShowTrak: the row's status text updates live as each step
-lands, then the row completes. The app shows the same messages under the box.
+Run **Feedback Demo**. It calls `ack.feedback()` five times, one call a second,
+and each message says exactly which call it is — there is no simulated work,
+just the calls themselves spaced out far enough to watch. In ShowTrak's script
+execution popup the row's status text updates live as each call lands, then the
+row completes when the handler calls `ack.success()`. The app shows the same
+messages under the box.
 
 Feedback is optional — the other four actions use none. To see a timeout
-instead, drop `timeoutMs` below `5000` in `registerSlowEvent()`: the ack
+instead, drop `timeoutMs` below `5000` in `registerFeedbackDemoEvent()`: the ack
 resolves as `RESOLVED_TIMEOUT`, the handler notices via `ack.isResolved()` and
 stops early, and the row fails in ShowTrak.
