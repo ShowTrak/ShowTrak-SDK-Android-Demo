@@ -13,6 +13,8 @@ import io.showtrak.sdk.Ack
 import io.showtrak.sdk.ConnectionState
 import io.showtrak.sdk.EventOptions
 import io.showtrak.sdk.ShowTrak
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 /**
  * Main screen for the Android demo app.
@@ -30,8 +32,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var clientIdText: TextView
     private lateinit var colourBox: View
     private lateinit var degradedSwitch: Switch
+    private lateinit var progressLabel: TextView
 
     private var connected = false
+
+    // Runs slow event handlers off the SDK's callback thread.
+    private val worker: ExecutorService = Executors.newSingleThreadExecutor()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +51,7 @@ class MainActivity : AppCompatActivity() {
         clientIdText = findViewById(R.id.clientIdText)
         colourBox = findViewById(R.id.colourBox)
         degradedSwitch = findViewById(R.id.degradedSwitch)
+        progressLabel = findViewById(R.id.progressLabel)
 
         restoreSettings()
 
@@ -85,7 +92,53 @@ class MainActivity : AppCompatActivity() {
         degradedSwitch.isChecked = false
     }
 
+    /**
+     * A deliberately slow event: five one-second steps, each reported through
+     * [Ack.feedback] so the message appears live on this event's row in
+     * ShowTrak's execution view. The work runs on a background thread — holding
+     * the SDK's callback thread for five seconds would stall its heartbeats.
+     */
+    private fun registerSlowEvent() {
+        val options = EventOptions(
+            label = "Run Diagnostics (5s)",
+            colour = 5,
+            hasFeedback = true,
+            icon = "activity",
+            // Comfortably longer than the work; drop it below 5000 to watch the
+            // ack resolve as RESOLVED_TIMEOUT instead.
+            timeoutMs = 20_000,
+        )
+        ShowTrak.registerEvent("RunDiagnostics", options) { ack: Ack ->
+            worker.execute {
+                try {
+                    for (step in 1..DIAGNOSTIC_STEPS) {
+                        // Someone else may have resolved this ack already (the
+                        // timeout, most likely) — stop rather than report on.
+                        if (ack.isResolved()) {
+                            showProgress("Diagnostics ${ack.getStatus()}")
+                            return@execute
+                        }
+                        Thread.sleep(1000)
+                        val message = "Step $step of $DIAGNOSTIC_STEPS complete"
+                        ack.feedback(message)
+                        showProgress(message)
+                    }
+                    ack.success()
+                    showProgress("Diagnostics finished: ${ack.getStatus()}")
+                } catch (e: InterruptedException) {
+                    Thread.currentThread().interrupt()
+                    ack.error("Diagnostics interrupted")
+                }
+            }
+        }
+    }
+
+    private fun showProgress(message: String) {
+        runOnUiThread { progressLabel.text = message }
+    }
+
     private fun registerDemoEvents() {
+        registerSlowEvent()
         // Each event picks its own Bootstrap Icons glyph, shown beside it in the
         // ShowTrak menu. "Reset Box" deliberately passes no icon to show the
         // default (a terminal glyph) that older integrations get for free.
@@ -138,10 +191,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         ShowTrak.disconnect()
+        worker.shutdownNow()
         super.onDestroy()
     }
 
     companion object {
+        private const val DIAGNOSTIC_STEPS = 5
+
         // Matches the box's starting colour in activity_main.xml.
         private const val DEFAULT_BOX_COLOUR = "#7f8c8d"
         private const val PREFS = "showtrak_demo"

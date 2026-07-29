@@ -2,14 +2,15 @@
 
 This project is a simple demo app for the ShowTrak Android SDK.
 
-It connects to a ShowTrak Server and registers four test actions:
+It connects to a ShowTrak Server and registers five test actions:
 
 - Set Box Red (icon `exclamation-octagon-fill`)
 - Set Box Green (icon `check-circle-fill`)
 - Set Box Blue (icon `droplet-fill`)
 - Reset Box (no icon — shows the default `terminal` glyph)
+- Run Diagnostics (5s) (icon `activity` — reports progress while it runs)
 
-When one of those actions is triggered from ShowTrak, the color box in the app updates.
+When one of the colour actions is triggered from ShowTrak, the color box in the app updates.
 
 Each action can name a [Bootstrap Icons](https://icons.getbootstrap.com) glyph via
 `EventOptions(icon = ...)`, which ShowTrak draws beside it in the menu. The icon is
@@ -21,7 +22,7 @@ gets when it says nothing.
 - `app/`: the demo Android app (`io.showtrak.sample`)
 
 SDK dependency:
-- `io.github.showtrak:showtrak-sdk:1.1.0`
+- `io.github.showtrak:showtrak-sdk:1.2.0`
 
 SDK repository:
 - https://github.com/ShowTrak/ShowTrak-SDK-Android
@@ -71,3 +72,15 @@ In ShowTrak, right-click the integrated client and run:
 
 You should see the box color change in the app, and each action listed under
 "Remote Events" with the icon it registered.
+
+## Try the progress feedback
+
+Run **Run Diagnostics (5s)**. It takes five seconds, one second per step, and
+calls `ack.feedback("Step N of 5 complete")` after each one. Watch the script
+execution popup in ShowTrak: the row's status text updates live as each step
+lands, then the row completes. The app shows the same messages under the box.
+
+Feedback is optional — the other four actions use none. To see a timeout
+instead, drop `timeoutMs` below `5000` in `registerSlowEvent()`: the ack
+resolves as `RESOLVED_TIMEOUT`, the handler notices via `ack.isResolved()` and
+stops early, and the row fails in ShowTrak.

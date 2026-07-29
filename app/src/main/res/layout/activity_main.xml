@@ -97,6 +97,15 @@
             android:paddingTop="8dp"
             android:text="Trigger 'Set Box Red/Green/Blue' from ShowTrak" />
 
+        <TextView
+            android:id="@+id/progressLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingTop="4dp"
+            android:textSize="12sp"
+            android:text="" />
+
         <Switch
             android:id="@+id/degradedSwitch"
             android:layout_width="match_parent"
