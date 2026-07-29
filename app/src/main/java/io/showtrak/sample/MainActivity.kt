@@ -18,7 +18,7 @@ import io.showtrak.sdk.ShowTrak
  * Main screen for the Android demo app.
  *
  * It stores server settings, connects to ShowTrak, and registers
- * three simple actions that change the color box.
+ * four simple actions that change the color box.
  */
 class MainActivity : AppCompatActivity() {
 
@@ -86,13 +86,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun registerDemoEvents() {
-        registerColourEvent("SetBoxRed", "Set Box Red", colour = 0, hex = "#e74c3c")
-        registerColourEvent("SetBoxGreen", "Set Box Green", colour = 3, hex = "#2ecc71")
-        registerColourEvent("SetBoxBlue", "Set Box Blue", colour = 4, hex = "#3498db")
+        // Each event picks its own Bootstrap Icons glyph, shown beside it in the
+        // ShowTrak menu. "Reset Box" deliberately passes no icon to show the
+        // default (a terminal glyph) that older integrations get for free.
+        registerColourEvent("SetBoxRed", "Set Box Red", colour = 0, hex = "#e74c3c", icon = "exclamation-octagon-fill")
+        registerColourEvent("SetBoxGreen", "Set Box Green", colour = 3, hex = "#2ecc71", icon = "check-circle-fill")
+        registerColourEvent("SetBoxBlue", "Set Box Blue", colour = 4, hex = "#3498db", icon = "droplet-fill")
+        registerColourEvent("ResetBox", "Reset Box", colour = 7, hex = DEFAULT_BOX_COLOUR, icon = null)
     }
 
-    private fun registerColourEvent(id: String, label: String, colour: Int, hex: String) {
-        ShowTrak.registerEvent(id, EventOptions(label = label, colour = colour, hasFeedback = true)) { ack: Ack ->
+    private fun registerColourEvent(id: String, label: String, colour: Int, hex: String, icon: String?) {
+        val options = EventOptions(label = label, colour = colour, hasFeedback = true, icon = icon)
+        ShowTrak.registerEvent(id, options) { ack: Ack ->
             runOnUiThread {
                 colourBox.setBackgroundColor(Color.parseColor(hex))
                 findViewById<TextView>(R.id.boxLabel).text = "Box is now: $label"
@@ -137,6 +142,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     companion object {
+        // Matches the box's starting colour in activity_main.xml.
+        private const val DEFAULT_BOX_COLOUR = "#7f8c8d"
         private const val PREFS = "showtrak_demo"
         private const val KEY_IP = "ip"
         private const val KEY_PORT = "port"

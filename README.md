@@ -2,20 +2,26 @@
 
 This project is a simple demo app for the ShowTrak Android SDK.
 
-It connects to a ShowTrak Server and registers three test actions:
+It connects to a ShowTrak Server and registers four test actions:
 
-- Set Box Red
-- Set Box Green
-- Set Box Blue
+- Set Box Red (icon `exclamation-octagon-fill`)
+- Set Box Green (icon `check-circle-fill`)
+- Set Box Blue (icon `droplet-fill`)
+- Reset Box (no icon — shows the default `terminal` glyph)
 
 When one of those actions is triggered from ShowTrak, the color box in the app updates.
+
+Each action can name a [Bootstrap Icons](https://icons.getbootstrap.com) glyph via
+`EventOptions(icon = ...)`, which ShowTrak draws beside it in the menu. The icon is
+optional: `Reset Box` omits it on purpose so you can see the default an integration
+gets when it says nothing.
 
 ## What is in this repo
 
 - `app/`: the demo Android app (`io.showtrak.sample`)
 
 SDK dependency:
-- `io.github.showtrak:showtrak-sdk:1.0.2`
+- `io.github.showtrak:showtrak-sdk:1.1.0`
 
 SDK repository:
 - https://github.com/ShowTrak/ShowTrak-SDK-Android
@@ -61,5 +67,7 @@ In ShowTrak, right-click the integrated client and run:
 - Set Box Red
 - Set Box Green
 - Set Box Blue
+- Reset Box
 
-You should see the box color change in the app.
+You should see the box color change in the app, and each action listed under
+"Remote Events" with the icon it registered.
