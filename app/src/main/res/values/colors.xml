@@ -1,0 +1,10 @@
+<resources>
+    <!-- Colour the box starts in, and returns to on Reset Box. Referenced from
+         both the layout and MainActivity so the two cannot drift apart. -->
+    <color name="box_default">#7f8c8d</color>
+
+    <!-- Match the ShowTrak palette entries the matching events index into. -->
+    <color name="box_red">#e74c3c</color>
+    <color name="box_green">#2ecc71</color>
+    <color name="box_blue">#3498db</color>
+</resources>

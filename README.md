@@ -23,10 +23,10 @@ shows the default `terminal` glyph.
 - `app/`: the demo Android app (`io.showtrak.sample`)
 
 SDK dependency:
-- `io.github.showtrak:showtrak-sdk:1.2.1`
+- `io.github.showtrak:showtrak-sdk:1.3.0`
 
 SDK repository:
-- https://github.com/ShowTrak/ShowTrak-SDK-Android
+- https://github.com/ShowTrak/ShowTrakClient-SDK-Android
 
 ## Troubleshooting
 

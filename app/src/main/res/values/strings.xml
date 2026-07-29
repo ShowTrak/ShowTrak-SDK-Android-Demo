@@ -1,3 +1,32 @@
 <resources>
     <string name="app_name">ShowTrak Integration Demo</string>
+
+    <!-- Connection form -->
+    <string name="label_server_ip">Server IP</string>
+    <string name="label_server_port">Server Port</string>
+    <string name="label_client_id">Client ID (optional)</string>
+    <string name="hint_server_ip">10.0.0.10</string>
+    <string name="hint_server_port">3000</string>
+    <string name="hint_client_id">leave blank to auto-generate</string>
+    <string name="action_connect">Connect</string>
+    <string name="action_disconnect">Disconnect</string>
+
+    <!-- Connection status -->
+    <string name="status_disconnected">Status: Disconnected</string>
+    <string name="status_connecting">Status: Connecting…</string>
+    <string name="status_pending_adoption">Status: Pending adoption — adopt this device in ShowTrak</string>
+    <string name="status_online">Status: Online</string>
+    <string name="status_invalid_address">Status: Enter a valid Server IP and Port</string>
+    <string name="client_id_format">Client ID: %1$s</string>
+
+    <!-- Colour box -->
+    <string name="box_prompt">Trigger \'Set Box Red/Green/Blue\' from ShowTrak</string>
+    <string name="box_now_format">Box is now: %1$s</string>
+
+    <!-- Feedback demo -->
+    <string name="feedback_call_format">ack.feedback() call %1$d of %2$d</string>
+    <string name="feedback_finished_format">ack.success() sent — ack is %1$s</string>
+    <string name="feedback_stopped_format">Stopped early: ack is %1$s</string>
+
+    <string name="action_report_degraded">Report DEGRADED state</string>
 </resources>

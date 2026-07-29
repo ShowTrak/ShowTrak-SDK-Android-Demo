@@ -1,14 +1,16 @@
 package io.showtrak.sample
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.CompoundButton
 import android.widget.EditText
-import android.widget.Switch
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SwitchCompat
+import androidx.annotation.ColorRes
+import androidx.core.content.ContextCompat
+import androidx.core.content.edit
 import io.showtrak.sdk.Ack
 import io.showtrak.sdk.ConnectionState
 import io.showtrak.sdk.EventOptions
@@ -31,7 +33,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var statusText: TextView
     private lateinit var clientIdText: TextView
     private lateinit var colourBox: View
-    private lateinit var degradedSwitch: Switch
+    private lateinit var boxLabel: TextView
+    private lateinit var degradedSwitch: SwitchCompat
     private lateinit var progressLabel: TextView
 
     private var connected = false
@@ -50,6 +53,7 @@ class MainActivity : AppCompatActivity() {
         statusText = findViewById(R.id.statusText)
         clientIdText = findViewById(R.id.clientIdText)
         colourBox = findViewById(R.id.colourBox)
+        boxLabel = findViewById(R.id.boxLabel)
         degradedSwitch = findViewById(R.id.degradedSwitch)
         progressLabel = findViewById(R.id.progressLabel)
 
@@ -69,7 +73,7 @@ class MainActivity : AppCompatActivity() {
         val port = portInput.text.toString().trim().toIntOrNull()
         val id = idInput.text.toString().trim().ifBlank { null }
         if (ip.isEmpty() || port == null) {
-            statusText.text = "Status: Enter a valid Server IP and Port"
+            statusText.setText(R.string.status_invalid_address)
             return
         }
         saveSettings(ip, port, id)
@@ -79,16 +83,16 @@ class MainActivity : AppCompatActivity() {
         ShowTrak.onStateChanged { state -> runOnUiThread { renderState(state) } }
 
         connected = true
-        connectBtn.text = "Disconnect"
+        connectBtn.setText(R.string.action_disconnect)
         setInputsEnabled(false)
     }
 
     private fun stop() {
         ShowTrak.disconnect()
         connected = false
-        connectBtn.text = "Connect"
+        connectBtn.setText(R.string.action_connect)
         setInputsEnabled(true)
-        statusText.text = "Status: Disconnected"
+        statusText.setText(R.string.status_disconnected)
         degradedSwitch.isChecked = false
     }
 
@@ -118,16 +122,21 @@ class MainActivity : AppCompatActivity() {
                         // Something else may have resolved this ack already (the
                         // timeout, most likely) — stop rather than report on.
                         if (ack.isResolved()) {
-                            showProgress("Stopped early: ack is ${ack.getStatus()}")
+                            showProgress(
+                                getString(R.string.feedback_stopped_format, ack.getStatus().name)
+                            )
                             return@execute
                         }
                         Thread.sleep(1000)
-                        val message = "ack.feedback() call $call of $FEEDBACK_CALLS"
+                        val message =
+                            getString(R.string.feedback_call_format, call, FEEDBACK_CALLS)
                         ack.feedback(message)
                         showProgress(message)
                     }
                     ack.success()
-                    showProgress("ack.success() sent — ack is ${ack.getStatus()}")
+                    showProgress(
+                        getString(R.string.feedback_finished_format, ack.getStatus().name)
+                    )
                 } catch (e: InterruptedException) {
                     Thread.currentThread().interrupt()
                     ack.error("Interrupted before ack.success()")
@@ -146,36 +155,49 @@ class MainActivity : AppCompatActivity() {
         // ShowTrak menu and tinted with the event's colour. The three colour
         // events share a plain filled circle so the colour is what tells them
         // apart; Reset Box gets its own glyph and colour.
-        registerColourEvent("SetBoxRed", "Set Box Red", colour = 0, hex = "#e74c3c", icon = "circle-fill")
-        registerColourEvent("SetBoxGreen", "Set Box Green", colour = 3, hex = "#2ecc71", icon = "circle-fill")
-        registerColourEvent("SetBoxBlue", "Set Box Blue", colour = 4, hex = "#3498db", icon = "circle-fill")
+        registerColourEvent("SetBoxRed", "Set Box Red", 0, R.color.box_red, "circle-fill")
+        registerColourEvent("SetBoxGreen", "Set Box Green", 3, R.color.box_green, "circle-fill")
+        registerColourEvent("SetBoxBlue", "Set Box Blue", 4, R.color.box_blue, "circle-fill")
         registerColourEvent(
             "ResetBox",
             "Reset Box",
             colour = 1,
-            hex = DEFAULT_BOX_COLOUR,
+            colourRes = R.color.box_default,
             icon = "arrow-counterclockwise",
         )
     }
 
-    private fun registerColourEvent(id: String, label: String, colour: Int, hex: String, icon: String?) {
+    private fun registerColourEvent(
+        id: String,
+        label: String,
+        colour: Int,
+        @ColorRes colourRes: Int,
+        icon: String?,
+    ) {
         val options = EventOptions(label = label, colour = colour, hasFeedback = true, icon = icon)
         ShowTrak.registerEvent(id, options) { ack: Ack ->
             runOnUiThread {
-                colourBox.setBackgroundColor(Color.parseColor(hex))
-                findViewById<TextView>(R.id.boxLabel).text = "Box is now: $label"
+                colourBox.setBackgroundColor(ContextCompat.getColor(this, colourRes))
+                boxLabel.text = getString(R.string.box_now_format, label)
             }
             ack.success()
         }
     }
 
     private fun renderState(state: ConnectionState) {
-        statusText.text = when (state) {
-            ConnectionState.DISCONNECTED -> "Status: Disconnected"
-            ConnectionState.CONNECTING -> "Status: Connecting…"
-            ConnectionState.PENDING_ADOPTION -> "Status: Pending adoption — adopt this device in ShowTrak"
-            ConnectionState.ONLINE -> "Status: Online"
-        }
+        statusText.setText(
+            when (state) {
+                ConnectionState.DISCONNECTED -> R.string.status_disconnected
+                ConnectionState.CONNECTING -> R.string.status_connecting
+                ConnectionState.PENDING_ADOPTION -> R.string.status_pending_adoption
+                ConnectionState.ONLINE -> R.string.status_online
+            }
+        )
+        // The SDK generates and persists an ID when none is supplied, so it is
+        // only knowable after connecting.
+        clientIdText.text = ShowTrak.getClientId()?.let {
+            getString(R.string.client_id_format, it)
+        }.orEmpty()
     }
 
     private fun setInputsEnabled(enabled: Boolean) {
@@ -192,15 +214,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun saveSettings(ip: String, port: Int, id: String?) {
-        getSharedPreferences(PREFS, MODE_PRIVATE).edit()
-            .putString(KEY_IP, ip)
-            .putString(KEY_PORT, port.toString())
-            .putString(KEY_ID, id ?: "")
-            .apply()
+        getSharedPreferences(PREFS, MODE_PRIVATE).edit {
+            putString(KEY_IP, ip)
+            putString(KEY_PORT, port.toString())
+            putString(KEY_ID, id ?: "")
+        }
     }
 
     override fun onDestroy() {
-        ShowTrak.disconnect()
+        // ShowTrak is a process-wide singleton, so the state listener and event
+        // handlers registered above — all of which capture this Activity — would
+        // outlive it. release() drops them along with the connection and the
+        // SDK's background thread; a later connect() builds a fresh client.
+        ShowTrak.release()
         worker.shutdownNow()
         super.onDestroy()
     }
@@ -208,8 +234,6 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val FEEDBACK_CALLS = 5
 
-        // Matches the box's starting colour in activity_main.xml.
-        private const val DEFAULT_BOX_COLOUR = "#7f8c8d"
         private const val PREFS = "showtrak_demo"
         private const val KEY_IP = "ip"
         private const val KEY_PORT = "port"
