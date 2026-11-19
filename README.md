@@ -1,4 +1,18 @@
-# ShowTrak Android Demo
+<div align="center">
+
+<a href="https://showtrak.co.uk"><img src="https://showtrak.co.uk/images/logo.png" alt="ShowTrak Android SDK Demo logo" width="128" height="128"></a>
+
+# ShowTrak Android SDK Demo
+
+**A sample Android app showing what the ShowTrak Android SDK can do.**
+
+[Website](https://showtrak.co.uk) · [Android SDK](https://github.com/ShowTrak/ShowTrakClient-SDK-Android) · [Discord](https://discord.gg/DACmwsbSGW)
+
+[![Android 7.0+][badge-android7]](https://showtrak.co.uk) [![Kotlin][badge-kotlin]](https://showtrak.co.uk)
+
+</div>
+
+## About the demo
 
 This project is a simple demo app for the ShowTrak Android SDK.
 
@@ -87,3 +101,21 @@ Feedback is optional — the other four actions use none. To see a timeout
 instead, drop `timeoutMs` below `5000` in `registerFeedbackDemoEvent()`: the ack
 resolves as `RESOLVED_TIMEOUT`, the handler notices via `ack.isResolved()` and
 stops early, and the row fails in ShowTrak.
+
+## Part of ShowTrak
+
+| App | What it does |
+| --- | --- |
+| **[ShowTrak Server](https://showtrak.co.uk/software/server)** | Monitor and control every computer and show device from one screen. |
+| **[ShowTrak Client](https://showtrak.co.uk/software/client)** | The lightweight app that lets ShowTrak Server watch and control a computer. |
+| **[ShowTrak Timers](https://showtrak.co.uk/software/timers)** | Show timers run from the desk, a Stream Deck, QLab or any browser. |
+| **[ShowTrak Portal](https://showtrak.co.uk)** | Show reports, schedules and team collaboration for live productions. |
+
+Find everything at **[showtrak.co.uk](https://showtrak.co.uk)**.
+
+## Support
+
+Questions, ideas or problems? Join the [ShowTrak Discord](https://discord.gg/DACmwsbSGW) or [open an issue](https://github.com/ShowTrak/ShowTrak-SDK-Android-Demo/issues).
+
+[badge-android7]: https://img.shields.io/badge/Android%207.0%2B-3DDC84?style=for-the-badge&logo=android&logoColor=white
+[badge-kotlin]: https://img.shields.io/badge/Kotlin-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white
