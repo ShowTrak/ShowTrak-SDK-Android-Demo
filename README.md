@@ -8,7 +8,7 @@
 
 [Website](https://showtrak.co.uk) · [Android SDK](https://github.com/ShowTrak/ShowTrakClient-SDK-Android) · [Discord](https://discord.gg/DACmwsbSGW)
 
-[![Android 7.0+][badge-android7]](https://showtrak.co.uk) [![Kotlin][badge-kotlin]](https://showtrak.co.uk)
+[![Android 7.0+][badge-android7]](https://showtrak.co.uk) [![Kotlin][badge-kotlin]](https://showtrak.co.uk) [![CI status][badge-ci]](https://github.com/ShowTrak/ShowTrak-SDK-Android-Demo/actions/workflows/ci.yml)
 
 </div>
 
@@ -119,3 +119,4 @@ Questions, ideas or problems? Join the [ShowTrak Discord](https://discord.gg/DAC
 
 [badge-android7]: https://img.shields.io/badge/Android%207.0%2B-3DDC84?style=for-the-badge&logo=android&logoColor=white
 [badge-kotlin]: https://img.shields.io/badge/Kotlin-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white
+[badge-ci]: https://img.shields.io/github/actions/workflow/status/ShowTrak/ShowTrak-SDK-Android-Demo/ci.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=CI
