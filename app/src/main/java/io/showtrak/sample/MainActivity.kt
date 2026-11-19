@@ -6,9 +6,9 @@ import android.widget.Button
 import android.widget.CompoundButton
 import android.widget.EditText
 import android.widget.TextView
+import androidx.annotation.ColorRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
-import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import io.showtrak.sdk.Ack
@@ -63,8 +63,11 @@ class MainActivity : AppCompatActivity() {
 
         degradedSwitch.setOnCheckedChangeListener { _: CompoundButton, isChecked: Boolean ->
             if (!connected) return@setOnCheckedChangeListener
-            if (isChecked) ShowTrak.setState("DEGRADED", "Custom Status")
-            else ShowTrak.setState("ONLINE")
+            if (isChecked) {
+                ShowTrak.setState("DEGRADED", "Custom Status")
+            } else {
+                ShowTrak.setState("ONLINE")
+            }
         }
     }
 
@@ -113,7 +116,7 @@ class MainActivity : AppCompatActivity() {
             icon = "broadcast",
             // Comfortably longer than the five calls; drop it below 5000 to
             // watch the ack resolve as RESOLVED_TIMEOUT instead.
-            timeoutMs = 20_000,
+            timeoutMs = 20_000
         )
         ShowTrak.registerEvent("FeedbackDemo", options) { ack: Ack ->
             worker.execute {
@@ -163,17 +166,11 @@ class MainActivity : AppCompatActivity() {
             "Reset Box",
             colour = 1,
             colourRes = R.color.box_default,
-            icon = "arrow-counterclockwise",
+            icon = "arrow-counterclockwise"
         )
     }
 
-    private fun registerColourEvent(
-        id: String,
-        label: String,
-        colour: Int,
-        @ColorRes colourRes: Int,
-        icon: String?,
-    ) {
+    private fun registerColourEvent(id: String, label: String, colour: Int, @ColorRes colourRes: Int, icon: String?) {
         val options = EventOptions(label = label, colour = colour, hasFeedback = true, icon = icon)
         ShowTrak.registerEvent(id, options) { ack: Ack ->
             runOnUiThread {
