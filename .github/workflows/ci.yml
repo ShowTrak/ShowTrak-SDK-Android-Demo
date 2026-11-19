@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Format, lint & build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # ktlint, through Spotless, with the style in .editorconfig.
+      # Fix locally with ./gradlew spotlessApply.
+      - name: Check formatting
+        run: ./gradlew spotlessCheck
+
+      # Android Lint fails the build on errors; warnings are reported only.
+      - name: Android Lint
+        run: ./gradlew :app:lint
+
+      - name: Build
+        run: ./gradlew :app:assembleDebug

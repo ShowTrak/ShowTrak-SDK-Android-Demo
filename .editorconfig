@@ -1,0 +1,16 @@
+# Code style for the Kotlin sources and Gradle scripts, read by ktlint
+# (./gradlew spotlessCheck) and by Android Studio.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{kt,kts}]
+indent_style = space
+indent_size = 4
+max_line_length = 120
+# Android Studio's Kotlin style, so the IDE's formatter and ktlint agree.
+ktlint_code_style = android_studio
